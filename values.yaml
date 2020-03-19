@@ -1,0 +1,49 @@
+# The Folding@Home project values, you might want to overwrite user and team.
+#
+# It relies on the docker image by https://github.com/richarvey/FoldingAtHome.
+# If you have your own user or team, override the values below. You can also
+# enable/disable gpus, smp, etc.
+foldingathome:
+  image: "richarvey/foldingathome:latest"
+  team: "240110"
+  user: "Anonymous"
+  gpu: "false"
+  smp: "true"
+  power: "full"
+  requests:
+    cpu: "1000m"
+    memory: "64Mi"
+  limits:
+    cpu: "2000m"
+    memory: "64Mi"
+
+# A set of predefined priorities for your cluster.
+# If you can drop if you already manage priorities yourself, otherwise this
+# will setup a default one and a very low priority which is used by the
+# workloads (enabling preemption).
+priority:
+  - name: default-priority
+    value: 100000
+    default: true
+  - name: vlow-priority
+    value: -100000
+
+# Boinc horizontal pod auto scaler configuration. The goal is to backfill the
+# cluster with folding@home workloads, so we use an hpa resource with a very high
+# number of max replicas (max replicas is currently mandatory).
+#
+# vlow-priority should be set to < -10, so that the cluster auto-scaler does
+# not take them into account.
+hpa:
+  minReplicas: 1
+  maxReplicas: 10000000
+  targetCPU: 90
+  priority: vlow-priority
+
+# A sample deployment to see the pod auto scaling working nicely, it deploys
+# higher prio pods consuming a lot of cpu.
+highpriodemo:
+  enabled: false
+  replicas: 1
+  cpu: "1000m"
+  memory: "256Mi"

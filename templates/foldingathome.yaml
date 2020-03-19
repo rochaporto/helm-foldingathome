@@ -1,0 +1,56 @@
+{{- range .Values.priority }}
+apiVersion: scheduling.k8s.io/v1beta1
+kind: PriorityClass
+metadata:
+  name: {{ .name }}
+value: {{ .value }}
+globalDefault: {{ .default | default false }}
+---
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: foldingathome
+  labels:
+    app: foldingathome
+spec:
+  selector:
+    matchLabels:
+      app: foldingathome
+  template:
+    metadata:
+      labels:
+        app: foldingathome
+    spec:
+      priorityClassName: {{ .Values.hpa.priority }}
+      containers:
+      - name: foldingathome
+        image: {{ .Values.foldingathome.image | default "richarvey/foldingathome:latest" }}
+        command: ["--user={{ .Values.foldingathome.user }}", "--team={{ .Values.foldingathome.team }}", "--gpu={{ .Values.foldingathome.gpu }}", "--smp={{ .Values.foldingathome.smp }}", "--power={{ .Values.foldingathome.power }}"]
+        resources:
+          requests:
+            cpu: {{ .Values.foldingathome.requests.cpu }}
+            memory: {{ .Values.foldingathome.requests.memory }}
+          limits:
+            cpu: {{ .Values.foldingathome.limits.cpu }}
+            memory: {{ .Values.foldingathome.limits.memory }}
+---
+kind: HorizontalPodAutoscaler
+apiVersion: autoscaling/v2beta2
+metadata:
+  name: foldingathome
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: foldingathome
+  minReplicas: {{ .Values.hpa.minReplicas }}
+  maxReplicas: {{ .Values.hpa.maxReplicas }}
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: {{ .Values.hpa.targetCPU }}
+

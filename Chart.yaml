@@ -1,0 +1,4 @@
+apiVersion: v1
+description: A Helm chart for folding@home backfill deployments
+name: foldingathome-hpa
+version: 0.1.0
