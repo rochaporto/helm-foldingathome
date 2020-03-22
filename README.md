@@ -11,7 +11,7 @@ It launches a horizontal pod autoscaler which will fill unused resources in your
 Check the [values.yaml](values.yaml) file for the available configuration.
 
 The default config works, but some things you might be interested in changing:
-* user and team: if you have your own values for Folding@Home
+* user and team: if you have your own values for Folding@Home (defaults to CERN team)
 * requests and limits: the defaults assume large(ish) nodes, you might want to tune these to better fill the holes in your cluster
 * gpu and smp: in case your nodes have gpus, turn them on
 

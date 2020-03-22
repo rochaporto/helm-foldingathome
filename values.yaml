@@ -5,8 +5,8 @@
 # enable/disable gpus, smp, etc.
 foldingathome:
   image: "richarvey/foldingathome:latest"
-  team: "240110"
-  user: "Anonymous"
+  team: "38188"
+  user: "Folding@Kubernetes"
   gpu: "false"
   smp: "true"
   power: "full"
