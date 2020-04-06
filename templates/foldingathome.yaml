@@ -26,7 +26,7 @@ spec:
       containers:
       - name: foldingathome
         image: {{ .Values.foldingathome.image | default "richarvey/foldingathome:latest" }}
-        command: ["--user={{ .Values.foldingathome.user }}", "--team={{ .Values.foldingathome.team }}", "--gpu={{ .Values.foldingathome.gpu }}", "--smp={{ .Values.foldingathome.smp }}", "--power={{ .Values.foldingathome.power }}"]
+        args: ["--user={{ .Values.foldingathome.user }}", "--team={{ .Values.foldingathome.team }}", "--gpu={{ .Values.foldingathome.gpu }}", "--smp={{ .Values.foldingathome.smp }}", "--power={{ .Values.foldingathome.power }}"]
         resources:
           requests:
             cpu: {{ .Values.foldingathome.requests.cpu }}
