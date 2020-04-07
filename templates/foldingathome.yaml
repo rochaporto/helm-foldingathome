@@ -10,19 +10,23 @@ globalDefault: {{ .default | default false }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: foldingathome
+  name: {{ .Release.Name }}
   labels:
-    app: foldingathome
+    app: {{ .Release.Name }}
 spec:
   replicas: {{ .Values.foldingathome.replicas }}
   selector:
     matchLabels:
-      app: foldingathome
+      app: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: foldingathome
+        app: {{ .Release.Name }}
     spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 0
 {{- if .Values.foldingathome.priorityClassName }}
       priorityClassName: {{ .Values.foldingathome.priorityClassName }}
 {{- end }}
@@ -39,28 +43,30 @@ spec:
         {{- end }}
         # FAHClient renames the given config to update with the slots, we need
         # to have an actual file not the configmap being passed to it.
-        command: ["/bin/bash", "-c", "cp /config.xml /etc/fahclient/config.xml && FAHClient --web-allow=0/0:7396 --allow=0/0:7396 --config /etc/fahclient/config.xml"]
+        command: ["/bin/bash", "-c", "mkdir -p /etc/fahclient; cp /config.xml /etc/fahclient/config.xml && FAHClient --web-allow=0/0:7396 --allow=0/0:7396 --config /etc/fahclient/config.xml"]
         volumeMounts:
         - name: foldingathome
           mountPath: /config.xml
           subPath: config.xml
         resources:
 {{ toYaml .Values.foldingathome.resources | indent 10 }}
+      nodeSelector:
+{{ toYaml .Values.foldingathome.nodeSelector | indent 8 }}
       volumes:
       - name: foldingathome
         configMap:
-          name: foldingathome
+          name: cm-{{ .Release.Name }}
 ---
 {{- if .Values.hpa.enabled }}
 kind: HorizontalPodAutoscaler
 apiVersion: autoscaling/v2beta2
 metadata:
-  name: foldingathome
+  name: hpa-{{ .Release.Name }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: foldingathome
+    name: {{ .Release.Name }}
   minReplicas: {{ .Values.hpa.minReplicas }}
   maxReplicas: {{ .Values.hpa.maxReplicas }}
   metrics:
