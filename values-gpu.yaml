@@ -1,0 +1,6 @@
+foldingathome:
+  config:
+    gpu: true
+  resources:
+    limits:
+      nvidia.com/gpu: 1

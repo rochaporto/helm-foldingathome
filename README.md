@@ -1,8 +1,13 @@
 # Helm Folding@Home
 
-A Helm Chart to deploy backfill workloads for [Folding@Home](https://foldingathome.org/).
+A Helm Chart to deploy workloads for [Folding@Home](https://foldingathome.org/).
 
-It launches a horizontal pod autoscaler which will fill unused resources in your cluster with pods executing workloads from [Folding@Home](https://foldingathome.org/). These workloads have low priority and are pre-emptible, meaning your main workloads will have priority and can take over when you scale up.
+You can set a fixed number of replicas or enable the horizontal pod autoscaler
+which will fill unused resources in your cluster with pods executing workloads
+from [Folding@Home](https://foldingathome.org/).
+
+These workloads have low priority and are pre-emptible, meaning your main
+workloads will have priority and can take over when you scale up.
 
 ![Monitoring](monit.png "Monitoring")
 
@@ -10,20 +15,30 @@ It launches a horizontal pod autoscaler which will fill unused resources in your
 
 Check the [values.yaml](values.yaml) file for the available configuration.
 
-The default config works, but some things you might be interested in changing:
+Things you probably want to override:
 * user and team: if you have your own values for Folding@Home (defaults to CERN team)
-* requests and limits: the defaults assume large(ish) nodes, you might want to tune these to better fill the holes in your cluster
-* gpu and smp: in case your nodes have gpus, turn them on
+
+The foldingathome.config section takes key/value pairs matching the params of
+the FAHClient tool, check the available options with:
+```
+kubectl exec -it pod <foldingathomepod> /FAHClient --help
+```
 
 ## Deployment
 
+The default values will enable CPU workloads only:
 ```bash
-helm install . --name foldingathome --namespace foldingathome
+helm install . --name folding-cpu --namespace folding \
+    --set foldingathome.config.user=YOURUSER
+    --set foldingathome.config.team=YOURTEAMID
 ```
 
-You can pass values directly at installation:
-```bash
-helm install . --name foldingathome --namespace foldingathome --set foldingathome.team=YOURTEAM --set foldingathome.user=YOURUSER
+If you have and want to use GPUs, pass the additional values file:
+```
+helm install . --name folding-cpu --namespace folding \
+    --values values-gpu.yaml
+    --set foldingathome.config.user=YOURUSER
+    --set foldingathome.config.team=YOURTEAMID
 ```
 
 ## Monitoring

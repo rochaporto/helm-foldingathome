@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: foldingathome 
+  labels:
+    app.kubernetes.io/name: foldingathome
+    helm.sh/chart: foldingathome
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  config.xml:
+    <config>
+      {{ range $key, $value := .Values.foldingathome.config }}
+      <{{ $key }} value='{{ $value }}'/>
+      {{ end }}
+    </config>

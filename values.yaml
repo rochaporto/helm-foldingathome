@@ -4,18 +4,36 @@
 # If you have your own user or team, override the values below. You can also
 # enable/disable gpus, smp, etc.
 foldingathome:
-  image: "richarvey/foldingathome:latest"
-  team: "38188"
-  user: "Folding@Kubernetes"
-  gpu: "false"
-  smp: "true"
-  power: "full"
-  requests:
-    cpu: "1000m"
-    memory: "64Mi"
-  limits:
-    cpu: "2000m"
-    memory: "64Mi"
+  image: null
+  # image: richarvey/foldingathome:latest
+  config:
+    gpu: false
+    passkey: ''
+    power: "full"
+    smp: "true"
+    team: "38188"
+    user: "CERN_Cloud"
+  priorityClassName: vlow-priority
+  replicas: 1
+  resources:
+    requests:
+      cpu: 1
+      memory: "1048Mi"
+    limits:
+      cpu: 1
+      memory: "2048Mi"
+
+# Horizontal pod auto scaler configuration. The goal is to backfill the
+# cluster with folding@home workloads, so we use an hpa resource with a very high
+# number of max replicas (max replicas is currently mandatory).
+#
+# vlow-priority should be set to < -10, so that the cluster auto-scaler does
+# not take them into account.
+hpa:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 10000000
+  targetCPU: 90
 
 # A set of predefined priorities for your cluster.
 # If you can drop if you already manage priorities yourself, otherwise this
@@ -28,22 +46,3 @@ priority:
   - name: vlow-priority
     value: -100000
 
-# Boinc horizontal pod auto scaler configuration. The goal is to backfill the
-# cluster with folding@home workloads, so we use an hpa resource with a very high
-# number of max replicas (max replicas is currently mandatory).
-#
-# vlow-priority should be set to < -10, so that the cluster auto-scaler does
-# not take them into account.
-hpa:
-  minReplicas: 1
-  maxReplicas: 10000000
-  targetCPU: 90
-  priority: vlow-priority
-
-# A sample deployment to see the pod auto scaling working nicely, it deploys
-# higher prio pods consuming a lot of cpu.
-highpriodemo:
-  enabled: false
-  replicas: 1
-  cpu: "1000m"
-  memory: "256Mi"

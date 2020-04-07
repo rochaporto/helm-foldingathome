@@ -14,6 +14,7 @@ metadata:
   labels:
     app: foldingathome
 spec:
+  replicas: {{ .Values.foldingathome.replicas }}
   selector:
     matchLabels:
       app: foldingathome
@@ -22,19 +23,35 @@ spec:
       labels:
         app: foldingathome
     spec:
-      priorityClassName: {{ .Values.hpa.priority }}
+{{- if .Values.foldingathome.priorityClassName }}
+      priorityClassName: {{ .Values.foldingathome.priorityClassName }}
+{{- end }}
       containers:
       - name: foldingathome
-        image: {{ .Values.foldingathome.image | default "richarvey/foldingathome:latest" }}
-        args: ["--user={{ .Values.foldingathome.user }}", "--team={{ .Values.foldingathome.team }}", "--gpu={{ .Values.foldingathome.gpu }}", "--smp={{ .Values.foldingathome.smp }}", "--power={{ .Values.foldingathome.power }}"]
+        {{- if .Values.image }}
+        image: {{ .Values.image }}
+        {{- else }}
+          {{- if .Values.foldingathome.config.gpu }}
+        image: richarvey/foldingathome:gpu
+          {{- else }}
+        image: richarvey/foldingathome:latest
+          {{- end }}
+        {{- end }}
+        # FAHClient renames the given config to update with the slots, we need
+        # to have an actual file not the configmap being passed to it.
+        command: ["/bin/bash", "-c", "cp /config.xml /etc/fahclient/config.xml && FAHClient --web-allow=0/0:7396 --allow=0/0:7396 --config /etc/fahclient/config.xml"]
+        volumeMounts:
+        - name: foldingathome
+          mountPath: /config.xml
+          subPath: config.xml
         resources:
-          requests:
-            cpu: {{ .Values.foldingathome.requests.cpu }}
-            memory: {{ .Values.foldingathome.requests.memory }}
-          limits:
-            cpu: {{ .Values.foldingathome.limits.cpu }}
-            memory: {{ .Values.foldingathome.limits.memory }}
+{{ toYaml .Values.foldingathome.resources | indent 10 }}
+      volumes:
+      - name: foldingathome
+        configMap:
+          name: foldingathome
 ---
+{{- if .Values.hpa.enabled }}
 kind: HorizontalPodAutoscaler
 apiVersion: autoscaling/v2beta2
 metadata:
@@ -53,4 +70,4 @@ spec:
       target:
         type: Utilization
         averageUtilization: {{ .Values.hpa.targetCPU }}
-
+{{- end }}
