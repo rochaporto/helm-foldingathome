@@ -11,19 +11,6 @@ workloads will have priority and can take over when you scale up.
 
 ![Monitoring](monit.png "Monitoring")
 
-## Setup
-
-Check the [values.yaml](values.yaml) file for the available configuration.
-
-Things you probably want to override:
-* user and team: if you have your own values for Folding@Home (defaults to CERN team)
-
-The foldingathome.config section takes key/value pairs matching the params of
-the FAHClient tool, check the available options with:
-```
-kubectl exec -it pod <foldingathomepod> /FAHClient --help
-```
-
 ## Deployment
 
 The default values will enable CPU workloads only:
@@ -39,6 +26,14 @@ helm install . --name folding-cpu --namespace folding \
     --values values-gpu.yaml
     --set foldingathome.config.user=YOURUSER
     --set foldingathome.config.team=YOURTEAMID
+```
+
+## Configuration
+
+The foldingathome.config section takes key/value pairs with any FAHClient param,
+check the available options with:
+```
+kubectl exec -it pod <foldingathomepod> /FAHClient --help
 ```
 
 ## Monitoring
