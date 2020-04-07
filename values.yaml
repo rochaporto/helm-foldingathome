@@ -13,6 +13,7 @@ foldingathome:
     smp: "true"
     team: "38188"
     user: "CERN_Cloud"
+  nodeSelector: {}
   priorityClassName: vlow-priority
   replicas: 1
   resources:
