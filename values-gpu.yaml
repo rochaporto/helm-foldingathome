@@ -1,6 +1,8 @@
 foldingathome:
   config:
+    cpu-usage: 25
     gpu: true
+    #passkey: ""
   nodeSelector:
     node-role.kubernetes.io/gpu: "true"
   resources:
