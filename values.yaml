@@ -4,8 +4,7 @@
 # If you have your own user or team, override the values below. You can also
 # enable/disable gpus, smp, etc.
 foldingathome:
-  image: null
-  # image: richarvey/foldingathome:latest
+  image: lukasheinrich/folding
   config:
     gpu: false
     passkey: ''

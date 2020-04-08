@@ -32,15 +32,7 @@ spec:
 {{- end }}
       containers:
       - name: foldingathome
-        {{- if .Values.image }}
-        image: {{ .Values.image }}
-        {{- else }}
-          {{- if .Values.foldingathome.config.gpu }}
-        image: richarvey/foldingathome:gpu
-          {{- else }}
-        image: richarvey/foldingathome:latest
-          {{- end }}
-        {{- end }}
+        image: {{ .Values.foldingathome.image }}
         # FAHClient renames the given config to update with the slots, we need
         # to have an actual file not the configmap being passed to it.
         command: ["/bin/bash", "-c", "mkdir -p /etc/fahclient; cp /config.xml /etc/fahclient/config.xml && FAHClient --web-allow=0/0:7396 --allow=0/0:7396 --config /etc/fahclient/config.xml"]
