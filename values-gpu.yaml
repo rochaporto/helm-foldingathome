@@ -1,8 +1,10 @@
 foldingathome:
   config:
-    cpu-usage: 25
     gpu: true
-    #passkey: ""
+    smp: false # disables CPU slots completely, guarantees better GPU efficiency
+  # you can also pass the slots explicitly
+  #slots:
+  #  0: "GPU"
   nodeSelector:
     node-role.kubernetes.io/gpu: "true"
   resources:
