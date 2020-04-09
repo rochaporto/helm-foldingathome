@@ -13,4 +13,7 @@ data:
       {{ range $key, $value := .Values.foldingathome.config }}
       <{{ $key }} value='{{ $value }}'/>
       {{ end }}
+      {{ range $key, $value := .Values.foldingathome.slots }}
+      <slot id='{{ $key }}' type='{{ $value }}'/>
+      {{ end }}
     </config>
